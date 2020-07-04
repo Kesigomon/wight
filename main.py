@@ -200,8 +200,8 @@ class Wight(commands.Cog):
             )
         await ctx.send(embed=embed)
 
-    @commands.command(brief='あなたのIDを表示しますよ')
-    async def id(self, ctx: commands.Context):
+    @commands.command(name="id", brief='あなたのIDを表示しますよ')
+    async def _id(self, ctx: commands.Context):
         await ctx.send(f'あなたのIDはこれです```{ctx.author.id}```')
 
     @commands.guild_only()  
