@@ -1,3 +1,4 @@
+import discord
 from discord.ext import commands
 import importlib
 import random
@@ -29,6 +30,7 @@ class Prefix():
 class WightBot(commands.Bot):
 
     def __init__(self, loop=None, **options):
+        options["intents"] = discord.Intents.all()
         super().__init__(loop=loop, command_prefix=Prefix('!k'), **options)
         self.remove_command('help')
         path = os.path.join(os.path.dirname(__file__), '..')
