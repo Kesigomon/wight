@@ -31,8 +31,8 @@ class Wight(commands.Cog):
 
     def __init__(self, bot, **kwargs):
         self.bot: commands.Bot = bot
-        self.ready = asyncio.Event(loop=self.bot.loop)
-        self.closed = asyncio.Event(loop=self.bot.loop)
+        self.ready = asyncio.Event()
+        self.closed = asyncio.Event()
         self.firstlaunch = True
         self.random = kwargs.get('random', Random())
         self._last_result = None
