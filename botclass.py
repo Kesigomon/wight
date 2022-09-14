@@ -8,14 +8,15 @@ import sys
 import asyncio
 import os
 
-__all__ = ['WightBot',]
+__all__ = ['WightBot', ]
 
-class Prefix():
+
+class Prefix:
 
     def __init__(self, prefix):
         self.prefix = prefix
         self.pattern = re.compile(re.escape(prefix) + r'(\s+)')
-    
+
     async def __call__(self, bot, message):
         match = self.pattern.search(message.content)
         if match:
@@ -33,6 +34,8 @@ class WightBot(commands.Bot):
         options["intents"] = discord.Intents.all()
         super().__init__(loop=loop, command_prefix=Prefix('!k'), **options)
         self.remove_command('help')
+
+    async def setup_hook(self):
         path = os.path.join(os.path.dirname(__file__), '..')
         sys.path.append(path)
         names = ('main',)
@@ -42,7 +45,7 @@ class WightBot(commands.Bot):
             else:
                 libname = f'{name}'
             lib = importlib.import_module(libname)
-            self.loop.create_task(lib.setup(self))
+            await lib.setup(self)
         sys.path.remove(path)
 
     async def close(self):
