@@ -1,19 +1,18 @@
 import asyncio
-import re
-import os
-import datetime
-from random import Random, SystemRandom
-import textwrap
 import contextlib
-import traceback
+import datetime
 import io
+import os
+import re
+import textwrap
+import traceback
+from random import Random
 
 import discord
 from discord.ext import commands
 
 
 class Wight(commands.Cog):
-
     agree_dict = {
         'ワイト': 'ワイト',
         'デビルマン': 'わかるマン',
@@ -92,13 +91,13 @@ class Wight(commands.Cog):
         if match:
             value = self.agree_dict[match.group(1)]
             if value == 'ワイト':
-                randint1 = self.random.randint(1,5)
+                randint1 = self.random.randint(1, 5)
                 if 1 <= randint1 <= 3:
                     fp = '{0}ワイト{1}.mp3'.format(self.file_prefix, randint1)
-                    await message.channel.send(files=[discord.File(f'{self.file_prefix}ワイト.png'),discord.File(fp)])
+                    await message.channel.send(files=[discord.File(f'{self.file_prefix}ワイト.png'), discord.File(fp)])
                 elif 4 <= randint1 <= 5:
                     await message.channel.send(files=[discord.File('{0}ワイト{1}.png'.format(self.file_prefix, randint1))
-                    ,discord.File('{0}ワイト{1}.mp3'.format(self.file_prefix, randint1))])
+                        , discord.File('{0}ワイト{1}.mp3'.format(self.file_prefix, randint1))])
             else:
                 await message.channel.send(
                     files=[discord.File('{0}{1}.mp3'.format(self.file_prefix, value)),
@@ -142,11 +141,11 @@ class Wight(commands.Cog):
                 ヒョウの模様は丸っこい輪っかが体に散らばってますやんか。
                 その丸っこい輪っかの中にさらに点々があるのがジャガーの模様です。
                 '''),
-                file=discord.File(f'{self.file_prefix}なかやまおにいさん.mp3')
-            )
+                                       file=discord.File(f'{self.file_prefix}なかやまおにいさん.mp3')
+                                       )
         elif message.content == 'まぁ、それはそれとして':
             await message.channel.send(file=discord.File(f'{self.file_prefix}まぁそれはそれとして.mp3'))
-    
+
     async def on_command_error(self, ctx, error):
         if ctx.cog is self:
             raise error
@@ -158,10 +157,11 @@ class Wight(commands.Cog):
                 return False
             try:
                 return await command.can_run(ctx)
-            except:
+            except commands.CommandError:
                 return False
+
         inline = False
-        embed = discord.Embed(description='ワイトができることです' ,inline=inline)
+        embed = discord.Embed(description='ワイトができることです')
         [embed.add_field(name=c.name, value=c.brief, inline=inline)
          for c in sorted(self.bot.commands, key=lambda c: c.name)
          if await can_run(c)]
@@ -176,25 +176,25 @@ class Wight(commands.Cog):
             await ctx.send(
                 f'{ctx.author.mention}\nあなたに止めることができないと、ワイトは思います'
             )
-    
+
     @commands.guild_only()
     @commands.command(brief='ワイトが取得できるサーバーの情報を表示します')
     async def server(self, ctx: commands.Context):
         server = ctx.guild
-        embed = discord.Embed(description='ワイトが取得できるサーバーの情報です。' )
-        embed.set_thumbnail(url=server.icon_url)
-        _Attr_dict = {'名前':'name' , 'ID':'id','サーバーリージョン':'region','AFKタイムアウト':'afk_timeout'}
+        embed = discord.Embed(description='ワイトが取得できるサーバーの情報です。')
+        embed.set_thumbnail(url=server.icon.url)
+        _Attr_dict = {'名前': 'name', 'ID': 'id', 'サーバーリージョン': 'region', 'AFKタイムアウト': 'afk_timeout'}
         for key, value in _Attr_dict.items():
-            #print(key,value,getattr(server,value))
-            embed.add_field(name=key,value=getattr(server,value),inline=False)
-        _Attr_dict = {'AFKチャンネル':'afk_channel','オーナー':'owner'}
+            # print(key,value,getattr(server,value))
+            embed.add_field(name=key, value=getattr(server, value), inline=False)
+        _Attr_dict = {'AFKチャンネル': 'afk_channel', 'オーナー': 'owner'}
         for key, value in _Attr_dict.items():
-            if getattr(server,value) is not None:
-                embed.add_field(name=key,value=getattr(server,value).mention,inline=False)
-        _Attr_dict ={'メンバー':'members','チャンネル':'channels','役職':'roles','絵文字':'emojis'}
+            if getattr(server, value) is not None:
+                embed.add_field(name=key, value=getattr(server, value).mention, inline=False)
+        _Attr_dict = {'メンバー': 'members', 'チャンネル': 'channels', '役職': 'roles', '絵文字': 'emojis'}
         for key, value in _Attr_dict.items():
             embed.add_field(
-                name=key+'の数',
+                name=key + 'の数',
                 value=f'len(getattr(server,value))',
                 inline=False
             )
@@ -204,40 +204,40 @@ class Wight(commands.Cog):
     async def _id(self, ctx: commands.Context):
         await ctx.send(f'あなたのIDはこれです```{ctx.author.id}```')
 
-    @commands.guild_only()  
+    @commands.guild_only()
     @commands.command(brief='このサーバーの役職とIDを表示します')
-    async def role(self, ctx: commands.Context, page = 0):
+    async def role(self, ctx: commands.Context, page=0):
         try:
             page = int(page)
         except ValueError:
             await ctx.send('ちゃんと数字を入れてほしいと思います')
             return
         title = 'ワイトが取得できるロール一覧です。'
-        description=''
+        description = ''
         nowpage = 0
         for role in (i for i in reversed(ctx.guild.roles) if not i.is_default()):
-            temp_description = '{1}(ID:{0})\n'.format(role.id,role.mention)
-            if len(description+temp_description) <= 2048:
+            temp_description = '{1}(ID:{0})\n'.format(role.id, role.mention)
+            if len(description + temp_description) <= 2048:
                 description += temp_description
             elif page == nowpage:
                 break
             else:
                 description = temp_description
                 nowpage += 1
-        embed = discord.Embed(title=title,description=description)
+        embed = discord.Embed(title=title, description=description)
         embed.set_footer(text=f'今のページは{nowpage + 1}です。"!k role <番号>"と打つとそのページに行くと思います')
         message1 = await ctx.send(embed=embed)
 
         def check(m):
             return (
-                m.author == ctx.author
-                and m.channel == ctx.channel
-                and m.content in ('削除', '維持')
+                    m.author == ctx.author
+                    and m.channel == ctx.channel
+                    and m.content in ('削除', '維持')
             )
 
         try:
             message2 = await self.bot.wait_for(
-                event='message',
+                'message',
                 check=check
             )
         except asyncio.TimeoutError:
@@ -247,23 +247,24 @@ class Wight(commands.Cog):
                 await message1.delete()
             if message2.content == '維持':
                 await ctx.send('このまま役職一覧を維持しますよ')
-    
+
     @commands.command(brief='ユニコードエスケープ（？）をします←ニコラスはどう思う？←わからん（わからず・ケイジ）')
     async def uniescape(self, ctx, *, arg):
         escaped = arg.encode('unicode-escape').decode('utf-8')
         await ctx.send(escaped)
-    
+
     @commands.command(brief='（サーバーに関係のない）あなたの情報を表示します')
     async def user(self, ctx, *, user: discord.User = None):
         if user is None:
             user = ctx.author
-        embed = discord.Embed(description='ワイトが取得できる（サーバーに関わらない）あなたの情報です。' )
+        embed = discord.Embed(description='ワイトが取得できる（サーバーに関わらない）あなたの情報です。')
         embed.set_thumbnail(url=ctx.author.avatar_url)
-        embed.add_field(name='名前',value=str(ctx.author),inline=False)
-        embed.add_field(name='ID',value=ctx.author.id,inline=False)
-        embed.add_field(name='アカウントが作られた日(UTC)',value=ctx.author.created_at.strftime('%Y/%m/%d %H:%M:%S'),inline=False)
+        embed.add_field(name='名前', value=str(ctx.author), inline=False)
+        embed.add_field(name='ID', value=ctx.author.id, inline=False)
+        embed.add_field(name='アカウントが作られた日(UTC)', value=ctx.author.created_at.strftime('%Y/%m/%d %H:%M:%S'),
+                        inline=False)
         await ctx.send(embed=embed)
-    
+
     @commands.command()
     async def poll(self, ctx, *args):
         if len(args) == 0:
@@ -277,13 +278,13 @@ class Wight(commands.Cog):
                 e + a for e, a in zip(emojis, answers)))
             m: discord.Message = await ctx.send('**{0}**'.format(args[0]), embed=embed)
             [self.bot.loop.create_task(m.add_reaction(e)) for e in emojis]
-    
+
     @commands.command(brief='ここすきします(あなたのメッセージにしか反応しません)')
     async def kokosuki(self, ctx, *args):
-        try: 
+        try:
             await ctx.message.delete()
         except discord.errors.Forbidden:
-            pass 
+            pass
         if not args:
             return
         for id in map(int, args):
@@ -291,25 +292,25 @@ class Wight(commands.Cog):
             if m.author == ctx.author or await self.bot.is_owner(ctx.author):
                 await self._kokosuki(m, sendowner=False)
 
-    async def _kokosuki(self, message,  sendowner=False):
+    async def _kokosuki(self, message, sendowner=False):
         if message.author.avatar_url != '':
-            Avatar_url = message.author.avatar_url
+            avatar_url = message.author.avatar_url
         else:
-            Avatar_url = message.author.default_avatar_url
+            avatar_url = message.author.default_avatar_url
         embed = discord.Embed(
             title='あーここすき',
             description=message.content,
             timestamp=message.created_at
         )
-        embed.set_author(name=message.author.display_name,icon_url=Avatar_url)
+        embed.set_author(name=message.author.display_name, icon_url=avatar_url)
         await message.channel.send(
             message.author.mention,
             embed=embed,
-            file=discord.File('{0}あーここすき{0}.mp3'.format(self.random.randint(1,2)))
+            file=discord.File('{0}あーここすき{0}.mp3'.format(self.random.randint(1, 2)))
         )
         if sendowner:
             await self.owner.send('ここすき！{0}'.format(message.channel.mention))
-    
+
     @commands.command(name='vc')
     async def _vc(self, ctx, channel: discord.VoiceChannel = None):
         if channel is None:
@@ -362,7 +363,8 @@ class Wight(commands.Cog):
 
         env.update(globals())
         await ctx.send('コマンドをどうぞ')
-        message = await self.bot.wait_for('message', check=lambda m: m.author == ctx.author and m.channel == ctx.channel)
+        message = await self.bot.wait_for('message',
+                                          check=lambda m: m.author == ctx.author and m.channel == ctx.channel)
         body = self.cleanup_code(message.content)
         stdout = io.StringIO()
 
