@@ -249,9 +249,12 @@ class Wight(commands.Cog):
                 await ctx.send('このまま役職一覧を維持しますよ')
 
     @commands.command(brief='ユニコードエスケープ（？）をします←ニコラスはどう思う？←わからん（わからず・ケイジ）')
-    async def uniescape(self, ctx, *, arg):
+    async def uniescape(self, ctx: commands.Context, *, arg):
         escaped = arg.encode('unicode-escape').decode('utf-8')
-        await ctx.send(escaped)
+        await ctx.send(
+            escaped,
+            allowed_mentions=discord.AllowedMentions.none()
+        )
 
     @commands.command(brief='（サーバーに関係のない）あなたの情報を表示します')
     async def user(self, ctx, *, user: discord.User = None):
@@ -326,9 +329,9 @@ class Wight(commands.Cog):
         await ctx.send(embed=discord.Embed(title='画面共有用URL', description=description))
 
     @commands.command(brief='出されたものをランダムで選んで表示しますよ')
-    async def random(self, ctx, *args):
+    async def random(self, ctx: commands.Context, *args):
         ret = self.random.choice(args)
-        await ctx.send(ret)
+        await ctx.send(ret, allowed_mentions=discord.AllowedMentions.none())
 
     def cleanup_code(self, content):
         """Automatically removes code blocks from the code."""
