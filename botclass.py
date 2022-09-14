@@ -41,8 +41,8 @@ class WightBot(commands.Bot):
                 libname = f'{__package__}.{name}'
             else:
                 libname = f'{name}'
-            lib = importlib.import_module(libname)  
-            lib.setup(self)
+            lib = importlib.import_module(libname)
+            self.loop.create_task(lib.setup(self))
         sys.path.remove(path)
 
     async def close(self):

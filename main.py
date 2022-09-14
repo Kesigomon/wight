@@ -400,5 +400,5 @@ class Wight(commands.Cog):
                 await ctx.send(f'```py\n{value}{ret}\n```')
 
 
-def setup(bot, **kwargs):
-    bot.add_cog(Wight(bot, **kwargs))
+async def setup(bot, **kwargs):
+    await bot.add_cog(Wight(bot, **kwargs))
